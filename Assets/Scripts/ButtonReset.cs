@@ -10,8 +10,12 @@ public class ButtonReset : MonoBehaviour
         SceneManager.LoadScene(0);
 
     }
-    public void ClickedOnNumber(string name)
+    public void ClickedOnShapeButton(string name)
     {
-        GameManager.instance.gotShapeName?.Invoke(name);
+        EventManager.instance.gotShapeName?.Invoke(name);
+    }
+    public void ClickedOnNumberButton(int number)
+    {
+        EventManager.instance.getNumber?.Invoke(number);
     }
 }

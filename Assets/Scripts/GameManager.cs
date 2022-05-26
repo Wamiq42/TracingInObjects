@@ -6,11 +6,15 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    [SerializeField]private List<GameObject> prefabs = new List<GameObject>();
-    
-    public List<GameObject> Prefabs
+    [SerializeField]private List<GameObject> shapePrefabs = new List<GameObject>();
+    private GameObject numberToGenerate;
+    public GameObject NumberToGenerate
     {
-        get => prefabs;
+        get => numberToGenerate;
+    }
+    public List<GameObject> ShapePrefabs
+    {
+        get => shapePrefabs;
     }
 
     private string nameOfShape;
@@ -22,13 +26,13 @@ public class GameManager : MonoBehaviour
             nameOfShape = value;
         }
     }
-    private List<GameObject> generatedPrefabs = new List<GameObject>();
-    public List<GameObject> GeneratedPrefabs
+    private List<GameObject> generatedShapePrefabs = new List<GameObject>();
+    public List<GameObject> GeneratedShapePrefabs
     {
-        get => generatedPrefabs;
+        get => generatedShapePrefabs;
         set
         {
-            generatedPrefabs = value;
+            generatedShapePrefabs = value;
         }
     }
     private List<float> pointsOfGeneratedPrefabs = new List<float>();
@@ -41,10 +45,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private List<GameObject> numbersPrefabs = new List<GameObject>();
+   
 
 
-    public delegate void GotShapeName(string name);
-    public GotShapeName gotShapeName;
     private void Awake()
     {
         if(instance != null)
@@ -56,14 +60,44 @@ public class GameManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        GetPrefabsFromResources();
+        GetShapesPrefabsFromResources();
+        GetNumberPrefabsFromResources();
     }
-
-    void GetPrefabsFromResources()
+    private void Start()
+    {
+        EventManager.instance.getNumber += GenerateTheSelectedNumber;
+    }
+    void GetNumberPrefabsFromResources()
+    {
+        foreach (var item in Resources.LoadAll<GameObject>("Numbers"))
+        {
+            numbersPrefabs.Add(item);
+        }
+    }
+    void GetShapesPrefabsFromResources()
     {
         foreach (var item in Resources.LoadAll<GameObject>("Shapes"))
         {
-            prefabs.Add(item);
+            shapePrefabs.Add(item);
         }
     }
+
+    void FindTheNumberToGenerate(int num)
+    {
+        foreach (var item in numbersPrefabs)
+        {
+            if (num == item.GetComponent<Numbers>().Number)
+            {
+                numberToGenerate = item;
+            }
+        }
+    }
+    
+    void GenerateTheSelectedNumber(int num)
+    {
+        FindTheNumberToGenerate(num);
+
+        Instantiate(numberToGenerate, transform.position, Quaternion.identity);
+    }
+
 }

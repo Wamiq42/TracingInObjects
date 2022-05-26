@@ -5,30 +5,30 @@ using PathCreation;
 
 public class MoveOnPath : MonoBehaviour
 {
-   // [SerializeField] private Transform[] routes;
-   // private int routeToGo;
-   // private float tParam;
-   // private Vector2 playerPosition;
-   //// private float speedModifier; 
-   // Vector2 p0;
-   // Vector2 p1;
-   // Vector2 p2;
-   // Vector2 p3;
+    // [SerializeField] private Transform[] routes;
+    // private int routeToGo;
+    // private float tParam;
+    // private Vector2 playerPosition;
+    //// private float speedModifier; 
+    // Vector2 p0;
+    // Vector2 p1;
+    // Vector2 p2;
+    // Vector2 p3;
 
-
+    //workedSolution
     public List<PathCreator> pathCreator;
    
     float distanceTravel;
 
-    //workedSolution
+   
     private bool isDragging = false;
     private bool onObject = false;
-    float dst = 0;
-    Vector3 lastPosition;
-    List<float> placedObjectPoint = new List<float>();
+    
+    
+   
     [SerializeField] private GameObject prefab;
     [SerializeField] private float spacing;
-    [SerializeField] private List<GameObject> generatedPrefabs = new List<GameObject>();
+    
     [SerializeField] private int indexOfPathCreator = 0;
     //private Rigidbody2D playerRigidbody2D;
 
@@ -37,18 +37,20 @@ public class MoveOnPath : MonoBehaviour
     {
 
         //playerRigidbody2D = GetComponent<Rigidbody2D>();
+        pathCreator = GameManager.instance.NumberToGenerate.GetComponent<Numbers>().Paths;
         transform.position = pathCreator[indexOfPathCreator].path.GetPointAtDistance(0);
-        lastPosition = transform.position;
+       
         //InstantiateGameObjectOnPath();
 
     }
     private void Update()
     {
-        if (isDragging && onObject && GameManager.instance.GeneratedPrefabs.Count!= 0)
+        if (isDragging && onObject && GameManager.instance.GeneratedShapePrefabs.Count!= 0)
         {
             //MovementOnPath();
             Movement();
             ObjectReveal();
+            IndexIncrementOnPathEnd();
         }
     }
     private void OnMouseEnter()
@@ -63,6 +65,15 @@ public class MoveOnPath : MonoBehaviour
         Debug.Log("Mouse is no longer on GameObject.");
     }
   
+    void IndexIncrementOnPathEnd()
+    {
+        if (distanceTravel == pathCreator[indexOfPathCreator].path.length && indexOfPathCreator < pathCreator.Count -1)
+        {
+            indexOfPathCreator += 1;
+        }
+    }
+
+
     void Movement()
     {
         //3rd workedSolution
@@ -84,7 +95,7 @@ public class MoveOnPath : MonoBehaviour
 
         /*****Movement With Transform*******/
         transform.position = nearestWorldPositionOnPath;
-        lastPosition = transform.position;
+        distanceTravel = pathCreator[indexOfPathCreator].path.GetClosestDistanceAlongPath(transform.position);
 
         //playerRigidbody2D.MovePosition(nearestWorldPositionOnPath);
 
@@ -113,7 +124,7 @@ public class MoveOnPath : MonoBehaviour
     {
         
         //distanceTravel = pathCreator.path.GetPointAtDistance()
-        //distanceTravel = pathCreator.path.GetClosestDistanceAlongPath(transform.position);
+        
         //Debug.Log("Distance in Travel (float) :" + distanceTravel);
         decimal distanceInDecimal = (decimal)pathCreator[indexOfPathCreator].path.GetClosestDistanceAlongPath(transform.position);
         distanceInDecimal = decimal.Round(distanceInDecimal, 1);
@@ -124,31 +135,14 @@ public class MoveOnPath : MonoBehaviour
             if (distanceInDecimal == (decimal.Round((decimal)GameManager.instance.PointsOfPrefabs[i],1)))
             {
                 Debug.Log("Accessed IF");
-                GameManager.instance.GeneratedPrefabs[i].SetActive(true);
+                GameManager.instance.GeneratedShapePrefabs[i].SetActive(true);
             }
         }
     }
 
 
 
-    void InstantiateGameObjectOnPath()
-    {
-        
-
-        while (dst < pathCreator[indexOfPathCreator].path.length)
-        {
-            Vector3 point = pathCreator[indexOfPathCreator].path.GetPointAtDistance(dst);
-           
-            placedObjectPoint.Add(dst);
-            Debug.Log(dst);
-            //Quaternion rot = pathCreator.path.GetRotationAtDistance(dst);
-            GameObject temp = Instantiate(prefab, point, Quaternion.identity, pathCreator[indexOfPathCreator].gameObject.transform);
-            generatedPrefabs.Add(temp);
-            temp.SetActive(false);
-
-            dst += spacing;
-        }
-    }
+   
 
 
 

@@ -13,4 +13,5 @@ public class Three : Numbers
         base.number = num;
         base.pathsInDigits = paths;
     }
+   
 }
